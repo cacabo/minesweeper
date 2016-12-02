@@ -234,11 +234,11 @@ public class Grid {
 	}
 	
 	public static void main(String[] args) {
-		Grid g = new Grid(Grid.Difficulty.EASY);
+		Grid g = new Grid(Grid.Difficulty.INTERMEDIATE);
 		System.out.println("Grid width: " + g.grid.length);
 		System.out.println("Grid height: " + g.grid[0].length + "\n");
 		System.out.println("Click at (2,2):\n");
-		g.generate(2, 2);
+		g.generate(7, 7);
 		System.out.println(g);
 	}
 }

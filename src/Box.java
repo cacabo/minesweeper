@@ -1,17 +1,14 @@
-
 public abstract class Box {
 
 	  protected Grid grid;
 	  private Position position;
-	  private boolean revealed;
-	  public enum BoxState {UNMARKED, MARKED, UNSURE};
+	  public enum BoxState {HIDDEN, REVEALED, MARKED, UNSURE};
 	  private BoxState state;
 	  
 	  public Box(Grid grid, Position position) {
 		  this.grid = grid;
 		  this.position = position;
-		  this.revealed = false;
-		  this.state = BoxState.UNMARKED;
+		  this.state = BoxState.HIDDEN;
 	  }
 	  
 	  public abstract String toString();
@@ -19,7 +16,7 @@ public abstract class Box {
 	  public abstract void leftClick();
 	  
 	  public void rightClick() {
-		  if (this.state == BoxState.UNMARKED) {
+		  if (this.state == BoxState.HIDDEN) {
 			  this.state = BoxState.MARKED;
 			  this.grid.incNumMarked();
 		  }
@@ -27,8 +24,8 @@ public abstract class Box {
 			  this.state = BoxState.UNSURE;
 			  this.grid.decNumMarked();
 		  }
-		  else
-			  this.state = BoxState.UNMARKED;
+		  else if (this.state == BoxState.UNSURE)
+			  this.state = BoxState.HIDDEN;
 	  }
 	  
 	  public Position getPosition() {
@@ -36,14 +33,33 @@ public abstract class Box {
 	  }
 	  
 	  public void reveal() {
-		  this.revealed = true;
+		  this.state = BoxState.REVEALED;
 	  }
 	  
 	  public boolean revealed() {
-		  return revealed;
+		  return this.state == BoxState.REVEALED;
 	  }
 	  
 	  public boolean marked() {
-		  return state == BoxState.MARKED;
+		  return this.state == BoxState.MARKED;
+	  }
+	  
+	  public boolean hidden() {
+		  return this.state == BoxState.HIDDEN;
+	  }
+	  
+	  public boolean unsure() {
+		  return this.state == BoxState.UNSURE;
+	  }
+	  
+	  public String boxState() {
+		  if (this.state == BoxState.HIDDEN)
+			  return "hidden";
+		  else if (this.state == BoxState.MARKED)
+			  return "marked";
+		  else if (this.state == BoxState.UNSURE)
+			  return "unsure";
+		  else
+			  return "hidden";
 	  }
 }
