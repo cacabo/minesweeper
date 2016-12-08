@@ -12,6 +12,7 @@ public class Mine extends Box implements Comparable<Box> {
 		this.reveal();
 		this.grid.lose();
 		this.grid.updateStatus();
+		this.paint();
 	}
 	
 	public String toStringNoReveal() {

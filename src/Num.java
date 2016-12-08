@@ -1,7 +1,7 @@
 import java.awt.Graphics;
 
 public class Num extends Box implements Comparable<Box> {
-	private int numMines;
+	private final int numMines;
 	
 	public Num(Grid grid, Position position) {
 		super(grid, position);
@@ -14,6 +14,10 @@ public class Num extends Box implements Comparable<Box> {
 		if (this.hidden()) {
 			this.reveal();
 			this.grid.incNumRevealed();
+			if (this.grid.hasWon()) {
+				grid.win();
+				return;
+			}
 			if (this.numMines == 0)
 				this.grid.cascade(this.getPosition());
 		}
@@ -21,6 +25,7 @@ public class Num extends Box implements Comparable<Box> {
 			if (this.grid.markedCount(this.getPosition()) == this.numMines)
 				this.grid.cascade(this.getPosition());
 		this.grid.updateStatus();
+		this.paint();
 	}
 	
 	public int getNumMines() {

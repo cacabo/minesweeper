@@ -536,3 +536,5 @@ Mine extends Box:
 
 - Cite any external resources (libraries, images, tutorials, etc.) that you may
   have used while implementing your game.
+  
+  http://stackoverflow.com/questions/22653592/how-to-give-spaces-between-jlabel

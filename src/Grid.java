@@ -71,9 +71,8 @@ public class Grid extends JPanel {
 				int y = e.getY();
 				int r = (int) Math.floor(y / scale);
 				
-				if (SwingUtilities.isLeftMouseButton(e)) {
+				if (SwingUtilities.isLeftMouseButton(e))
 					leftClick(r, c);
-				}
 				else if (SwingUtilities.isRightMouseButton(e))
 					rightClick(r, c);
 			}
@@ -148,41 +147,42 @@ public class Grid extends JPanel {
 						b.leftClick();
 					}
 					else if (SwingUtilities.isRightMouseButton(e))
-						if (b != null)
+						if (b != null) {
 							b.rightClick();
+						}
 				}
 			}
 		});
 	}
 	
-	public void reset() {
-		this.grid = new Box[this.getRows()][this.getCols()];
+	private void resetHelper() {
 		this.time = 0;
-		this.numRevealed = 0;
 		this.numMarked = 0;
+		this.numRevealed = 0;
 		this.gameStatus = GameStatus.NOT_STARTED;
+		this.timer.stop();
 		this.updateStatus();
 		this.updateMinesRemaining();
 		this.updateTime();
+	}
+	
+	public void reset() {
+		this.grid = new Box[this.getRows()][this.getCols()];
+		this.resetHelper();
+		this.repaint();
 		// Make sure that this component has the keyboard focus
-		requestFocusInWindow();
+		// requestFocusInWindow();
 	}
 	
 	public void reset(Difficulty d) {
 		if (this.difficulty == d)
 			this.reset();
 		Grid g = new Grid(d, new JLabel("Game Not Started"), new JLabel("Mines left: 10"), new JLabel("Time: 0"));
-		
 		this.grid = g.grid;
 		this.difficulty = g.difficulty;
 		this.numMines = g.numMines;
-		this.numMarked = 0;
-		this.numRevealed = 0;
-		this.time = 0;
-		this.gameStatus = GameStatus.NOT_STARTED;
-		this.updateStatus();
-		this.updateMinesRemaining();
-		this.updateTime();
+		this.resetHelper();
+		this.repaint();
 	}
 	
 	public void incNumRevealed() {
@@ -316,6 +316,7 @@ public class Grid extends JPanel {
 			}
 		this.timer.stop();
 		this.gameStatus = GameStatus.LOST;
+		this.repaint();
 	}
 	
 	public boolean hasWon() {
@@ -330,15 +331,16 @@ public class Grid extends JPanel {
 //			}
 //		this.gameStatus = GameStatus.WON;
 		int nums = this.getRows() * this.getCols() - this.numMines;
-		if (nums == this.numRevealed) {
-			this.gameStatus = GameStatus.WON;
-			this.updateStatus();
-			this.timer.stop();
-			return true;
-		}
-		return false;
+		return nums == this.numRevealed;
 	}
 
+	public void win() {
+		this.gameStatus = GameStatus.WON;
+		this.updateStatus();
+		this.timer.stop();
+		this.repaint();	
+	}
+	
 	public int getRows() {
 		return this.grid.length;
 	}
@@ -492,12 +494,13 @@ public class Grid extends JPanel {
 		if (this.lost()) {
 			g.setColor(new Color(255, 0, 0, 48));
 			g.fillRect(0, 0, this.getCols() * scale, this.getRows() * scale);
+			repaint();
 		}
-		else if (this.won() || this.hasWon()) {
+		else if (this.won()) {
 			g.setColor(new Color(0, 255, 0, 48));
 			g.fillRect(0, 0, this.getCols() * scale, this.getRows() * scale);
+			repaint();
 		}
-		repaint();
 	}
 
 	@Override
@@ -511,46 +514,46 @@ public class Grid extends JPanel {
 		 */
 	}
 	
-//	public static void main(String[] args) {
-//		Scanner scan = new Scanner(System.in);
-//		Grid g = new Grid(Grid.Difficulty.BEGINNER, new JLabel("Game Not Started"));
-//		System.out.println(g);
-//		System.out.println("Enter click coords:\nRow: ");
-//		int r = scan.nextInt();
-//		System.out.println("Col: ");
-//		int c = scan.nextInt();
-//		System.out.println("Click at (" + r + "," + c + ")");
-//		g.leftClick(r, c);
-//		System.out.println(g);
-//		while (g.gameStatus == GameStatus.IN_PROGRESS) {
-//			String click = null;
-//			System.out.println("Enter click type:");
-//			System.out.print("l/r: ");
-//			String s = scan.next();
-//			if (s.equals("l"))
-//				click = s;
-//			else if (s.equals("r"))
-//				click = s;
-//			while (click == null) {
-//				System.out.println("Invalid input, l: left, r: right");
-//				s = scan.next();
-//				if (s.equals("l"))
-//					click = s;
-//				else if (s.equals("r"))
-//					click = s;
-//			}
-//			System.out.println("Enter click coords:");
-//			System.out.print("Row: ");
-//			r = scan.nextInt();
-//			System.out.print("Col: ");
-//			c = scan.nextInt();
-//			System.out.println("Click at (" + r + "," + c + ")");
-//			if (s.equals("l"))
-//				g.leftClick(r, c);
-//			else
-//				g.rightClick(r, c);
-//			System.out.println(g);
-//		}
-//		scan.close();
-//	}
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		Grid g = new Grid(Grid.Difficulty.BEGINNER, new JLabel("Game Not Started"), new JLabel(""), new JLabel(""));
+		System.out.println(g);
+		System.out.println("Enter click coords:\nRow: ");
+		int r = scan.nextInt();
+		System.out.println("Col: ");
+		int c = scan.nextInt();
+		System.out.println("Click at (" + r + "," + c + ")");
+		g.leftClick(r, c);
+		System.out.println(g);
+		while (g.gameStatus == GameStatus.IN_PROGRESS) {
+			String click = null;
+			System.out.println("Enter click type:");
+			System.out.print("l/r: ");
+			String s = scan.next();
+			if (s.equals("l"))
+				click = s;
+			else if (s.equals("r"))
+				click = s;
+			while (click == null) {
+				System.out.println("Invalid input, l: left, r: right");
+				s = scan.next();
+				if (s.equals("l"))
+					click = s;
+				else if (s.equals("r"))
+					click = s;
+			}
+			System.out.println("Enter click coords:");
+			System.out.print("Row: ");
+			r = scan.nextInt();
+			System.out.print("Col: ");
+			c = scan.nextInt();
+			System.out.println("Click at (" + r + "," + c + ")");
+			if (s.equals("l"))
+				g.leftClick(r, c);
+			else
+				g.rightClick(r, c);
+			System.out.println(g);
+		}
+		scan.close();
+	}
 }

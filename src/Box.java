@@ -7,8 +7,8 @@ import javax.imageio.ImageIO;
 
 public abstract class Box implements Comparable<Box> {
 
-	  protected Grid grid;
-	  private Position position;
+	  protected final Grid grid;
+	  private final Position position;
 	  public enum BoxState {HIDDEN, REVEALED, MARKED, UNSURE};
 	  private BoxState state;
 	  
@@ -51,6 +51,7 @@ public abstract class Box implements Comparable<Box> {
 		  }
 		  else if (this.state == BoxState.UNSURE)
 			  this.state = BoxState.HIDDEN;
+		  this.paint();
 	  }
 	  
 	  public Position getPosition() {
@@ -93,4 +94,9 @@ public abstract class Box implements Comparable<Box> {
 	  }
 	  
 	  abstract public void draw(Graphics g);
+	  
+	  public void paint() {
+		  Graphics g = grid.getGraphics();
+		  this.draw(g);
+	  }
 }
