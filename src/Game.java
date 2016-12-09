@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -122,11 +121,6 @@ public class Game implements Runnable {
 			}
 		});
 		
-		
-		// IMPLEMENT THIS
-		//
-		//
-		
 		custom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JLabel r1 = new JLabel("Number of rows:  ");
@@ -170,7 +164,7 @@ public class Game implements Runnable {
 						int row = Integer.parseInt(r2.getText());
 						int col = Integer.parseInt(c2.getText());
 						int mines = Integer.parseInt(m2.getText());
-						if (row < 3 || row > 48 || col < 3 || col > 48 || mines < 0 || mines > row * col - 9)
+						if (row < 4 || row > 48 || col < 4 || col > 48 || mines < 0 || mines > row * col - 9)
 							throw new IllegalArgumentException();
 						frame.setSize(new Dimension((int)(Grid.scale * (row + .5)), Grid.scale * (col + 2) + addH));
 						grid.reset(row, col, mines);

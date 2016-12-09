@@ -1,20 +1,27 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -27,6 +34,7 @@ public class Grid extends JPanel {
 	private int numMarked;
 	private int numRevealed;
 	private int time;
+	private String name = "user";
 	public enum GameStatus {NOT_STARTED, IN_PROGRESS, LOST, WON};
 	private GameStatus gameStatus;
 	private JLabel status;
@@ -161,6 +169,7 @@ public class Grid extends JPanel {
 		this.numRevealed = 0;
 		this.gameStatus = GameStatus.NOT_STARTED;
 		this.timer.stop();
+		this.name = "user";
 		this.updateStatus();
 		this.updateMinesRemaining();
 		this.updateTime();
@@ -216,6 +225,14 @@ public class Grid extends JPanel {
 	
 	public Difficulty getDifficulty() {
 		return this.difficulty;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	private Set<Position> getSurroundings(Position p) {
@@ -349,11 +366,51 @@ public class Grid extends JPanel {
 		return nums == this.numRevealed;
 	}
 
-	public void win() {
+	public void win() throws IOException {		
 		this.gameStatus = GameStatus.WON;
 		this.updateStatus();
 		this.timer.stop();
-		this.repaint();	
+		this.repaint();
+		
+		try {
+			if (this.name.equals("user") && this.isHighScore()) {
+				JLabel nameLabel = new JLabel("<html>Congrats! You got a high score.<br>"
+						+ "please enter your name:</html>");
+				nameLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+						
+				JTextField nameField = new JTextField(8);
+				
+				JPanel namePanel = new JPanel();
+				namePanel.add(nameLabel);
+				namePanel.add(nameField);
+				
+				int result = JOptionPane.showConfirmDialog(
+						null,
+						namePanel,
+						"Enter Your Name",
+						JOptionPane.OK_CANCEL_OPTION
+						);
+				if (result == JOptionPane.OK_OPTION) {
+					try {
+						String name = nameField.getText();
+						
+						if (name == null || name.length() < 2 || name.length() > 18)
+							throw new IllegalArgumentException();
+						else
+							this.setName(name);
+					} catch(Exception error) {
+						JOptionPane.showMessageDialog(null,
+							    "Input Exception.",
+							    "Inane error",
+							    JOptionPane.ERROR_MESSAGE
+							    );
+					}
+				}					
+			}
+		} catch (IOException e) {
+		}
+		
+		this.writeHighScores();
 	}
 	
 	public int getRows() {
@@ -529,46 +586,133 @@ public class Grid extends JPanel {
 		 */
 	}
 	
-	public static void main(String[] args) {
-		Scanner scan = new Scanner(System.in);
-		Grid g = new Grid(Grid.Difficulty.BEGINNER, new JLabel("Game Not Started"), new JLabel(""), new JLabel(""));
-		System.out.println(g);
-		System.out.println("Enter click coords:\nRow: ");
-		int r = scan.nextInt();
-		System.out.println("Col: ");
-		int c = scan.nextInt();
-		System.out.println("Click at (" + r + "," + c + ")");
-		g.leftClick(r, c);
-		System.out.println(g);
-		while (g.gameStatus == GameStatus.IN_PROGRESS) {
-			String click = null;
-			System.out.println("Enter click type:");
-			System.out.print("l/r: ");
-			String s = scan.next();
-			if (s.equals("l"))
-				click = s;
-			else if (s.equals("r"))
-				click = s;
-			while (click == null) {
-				System.out.println("Invalid input, l: left, r: right");
-				s = scan.next();
-				if (s.equals("l"))
-					click = s;
-				else if (s.equals("r"))
-					click = s;
-			}
-			System.out.println("Enter click coords:");
-			System.out.print("Row: ");
-			r = scan.nextInt();
-			System.out.print("Col: ");
-			c = scan.nextInt();
-			System.out.println("Click at (" + r + "," + c + ")");
-			if (s.equals("l"))
-				g.leftClick(r, c);
-			else
-				g.rightClick(r, c);
-			System.out.println(g);
-		}
-		scan.close();
+	private String scoreToString() {
+		return "" + this.name + "," + this.time;
 	}
+	
+	public boolean isHighScore() throws IOException {
+		if (this.lost() || !this.won())
+			return false;
+		List<Integer> scores = Grid.highScoresToInts(this.difficulty);
+		if (scores.size() < 5)
+			return true;
+		return this.time < scores.get(4);
+	}
+	
+	private List<String> newHighScoresToString() throws IOException {		
+		List<String> strings = Grid.highScoresToStrings(this.difficulty);		
+		List<Integer> ints = Grid.highScoresToInts(strings);
+		if (strings == null || strings.isEmpty()) {
+			List<String> l = new LinkedList<String>();
+			l.add(this.scoreToString());
+			return l;
+		}
+		int index = 0;
+		for (int i : ints) {
+			if (this.time > i)
+				index++;
+		}
+		if (index < strings.size()) {
+			strings.add(index, "" + this.scoreToString());
+			if (strings.size() == 6)
+				strings.remove(5);
+		}
+		else if (index < 5)
+			strings.add(this.scoreToString());
+		return strings;
+	}
+	
+	public void writeHighScores() throws IOException {
+		if (!this.isHighScore())
+			return;
+		List<String> strings = newHighScoresToString();
+		PrintWriter writer = new PrintWriter(this.difficultyToString().toString() + ".txt");
+		for (String s : strings)
+			writer.println(s);
+		writer.close();
+	}
+	
+	private static List<String> highScoresToStrings(Difficulty d) throws IOException {
+		List<String> l = new LinkedList<String>();
+		BufferedReader r = new BufferedReader(new FileReader(d.toString() + ".txt"));
+		try {
+			boolean done = false;
+			while (!done) {
+				String line = r.readLine();
+				if (line == null)
+					done = true;
+				else
+					l.add(line);
+			}
+		}
+		catch (IOException e) {
+		} finally {
+			r.close();
+		}
+		return l;
+	}
+	
+	private static List<Integer> highScoresToInts(Difficulty d) throws IOException {
+		List<String> strings = highScoresToStrings(d);
+		return highScoresToInts(strings);
+	}
+	
+	private static List<Integer> highScoresToInts(List<String> strings) throws IOException {
+		List<Integer> ints = new LinkedList<Integer>();
+		try {
+			for (String s : strings) {
+				int i = s.indexOf(",");
+				if (i == -1)
+					throw new IOException();
+				Integer score = Integer.parseInt(s.substring(i + 1));
+				ints.add(score);
+			}
+		}
+		catch (IOException e) {
+		}
+		return ints;
+	}
+	
+//	public static void main(String[] args) {
+//		Scanner scan = new Scanner(System.in);
+//		Grid g = new Grid(Grid.Difficulty.BEGINNER, new JLabel("Game Not Started"), new JLabel(""), new JLabel(""));
+//		System.out.println(g);
+//		System.out.println("Enter click coords:\nRow: ");
+//		int r = scan.nextInt();
+//		System.out.println("Col: ");
+//		int c = scan.nextInt();
+//		System.out.println("Click at (" + r + "," + c + ")");
+//		g.leftClick(r, c);
+//		System.out.println(g);
+//		while (g.gameStatus == GameStatus.IN_PROGRESS) {
+//			String click = null;
+//			System.out.println("Enter click type:");
+//			System.out.print("l/r: ");
+//			String s = scan.next();
+//			if (s.equals("l"))
+//				click = s;
+//			else if (s.equals("r"))
+//				click = s;
+//			while (click == null) {
+//				System.out.println("Invalid input, l: left, r: right");
+//				s = scan.next();
+//				if (s.equals("l"))
+//					click = s;
+//				else if (s.equals("r"))
+//					click = s;
+//			}
+//			System.out.println("Enter click coords:");
+//			System.out.print("Row: ");
+//			r = scan.nextInt();
+//			System.out.print("Col: ");
+//			c = scan.nextInt();
+//			System.out.println("Click at (" + r + "," + c + ")");
+//			if (s.equals("l"))
+//				g.leftClick(r, c);
+//			else
+//				g.rightClick(r, c);
+//			System.out.println(g);
+//		}
+//		scan.close();
+//	}
 }

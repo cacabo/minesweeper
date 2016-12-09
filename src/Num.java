@@ -15,7 +15,10 @@ public class Num extends Box implements Comparable<Box> {
 			this.reveal();
 			this.grid.incNumRevealed();
 			if (this.grid.hasWon()) {
-				grid.win();
+				try {
+					grid.win();
+				} catch (Exception e) {
+				}
 				return;
 			}
 			if (this.numMines == 0)
