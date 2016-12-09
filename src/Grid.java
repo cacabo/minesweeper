@@ -45,7 +45,7 @@ public class Grid extends JPanel {
 	// timer should be started * * * upon generation * * *
 
 	public Grid(int rows, int columns, int numMines, JLabel status, JLabel minesRemaining, JLabel timeStatus) {
-		setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		
 		this.grid = new Box[rows][columns];
 		this.numMines = numMines;
@@ -185,6 +185,15 @@ public class Grid extends JPanel {
 		this.repaint();
 	}
 	
+	public void reset(int row, int col, int mines) {
+		Grid g = new Grid(row, col, mines, new JLabel("Game Not Started"), new JLabel("Mines left: 10"), new JLabel("Time: 0"));
+		this.grid = g.grid;
+		this.difficulty = Difficulty.CUSTOM;
+		this.numMines = mines;
+		this.resetHelper();
+		this.repaint();
+	}
+	
 	public void incNumRevealed() {
 		this.numRevealed ++;
 	}
@@ -203,6 +212,10 @@ public class Grid extends JPanel {
 	
 	public int getNumMarked() {
 		return this.numMarked;
+	}
+	
+	public Difficulty getDifficulty() {
+		return this.difficulty;
 	}
 	
 	private Set<Position> getSurroundings(Position p) {
@@ -284,6 +297,8 @@ public class Grid extends JPanel {
 	}
 	
 	private void incTime() {
+		if (this.time == 999)
+			return;
 		this.time++;
 		this.updateTime();
 	}

@@ -538,3 +538,7 @@ Mine extends Box:
   have used while implementing your game.
   
   http://stackoverflow.com/questions/22653592/how-to-give-spaces-between-jlabel
+  
+  http://stackoverflow.com/questions/685521/multiline-text-in-jlabel
+  
+  http://docs.oracle.com/javase/tutorial/uiswing/components/dialog.html
