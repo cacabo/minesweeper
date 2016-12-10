@@ -529,6 +529,9 @@ Mine extends Box:
 =:                                 Adjustment                                 :=
 ================================================================================
 
+high scores panel
+double clicks
+
 
 ================================================================================
 =:                             External Resources                             :=
@@ -537,8 +540,16 @@ Mine extends Box:
 - Cite any external resources (libraries, images, tutorials, etc.) that you may
   have used while implementing your game.
   
-  http://stackoverflow.com/questions/22653592/how-to-give-spaces-between-jlabel
+  Help with implementation:
   
-  http://stackoverflow.com/questions/685521/multiline-text-in-jlabel
+      http://stackoverflow.com/questions/22653592/how-to-give-spaces-between-jlabel
+      http://stackoverflow.com/questions/685521/multiline-text-in-jlabel
+      http://docs.oracle.com/javase/tutorial/uiswing/components/dialog.html
+      http://stackoverflow.com/questions/15526255/best-way-to-get-sound-on-button-press-for-a-java-calculator
   
-  http://docs.oracle.com/javase/tutorial/uiswing/components/dialog.html
+  Sound Files:
+  
+      https://www.freesoundeffects.com/free-sounds/explosion-10070/
+      http://soundbible.com/1003-Ta-Da.html
+      http://soundbible.com/1133-Beep-Ping.html
+      http://soundbible.com/819-Checkout-Scanner-Beep.html

@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,7 +18,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -70,26 +77,56 @@ public class Grid extends JPanel {
 		this.numRevealed = 0;
 	}
 	
+	
+	private void beepHelper(String s) {
+		try {
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(s).getAbsoluteFile());
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioInputStream);
+			clip.start();
+		} catch (IOException exception) {
+			System.out.println("Caught IO Exception");
+		} catch (UnsupportedAudioFileException exception) {
+			System.out.println("Caught Unsupported Audio File Exception"); 
+	    } catch (LineUnavailableException exception) {
+			System.out.println("Caught Line Unavailable Exception");
+		}
+	}
+	private void beep() {
+		beepHelper("beep.wav");
+	}
+	
+	private void beep2() {
+		beepHelper("beep2.wav");
+	}
+	
 	public void mouseListenerHelper() {
 		this.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(MouseEvent e) {				
 				int x = e.getX();
 				int c = (int) Math.floor(x / scale());
 				int y = e.getY();
 				int r = (int) Math.floor(y / scale());
 				if (e.getClickCount() == 2) {
-					if (SwingUtilities.isLeftMouseButton(e))
+					if (SwingUtilities.isLeftMouseButton(e)) {
+						beep();
 						doubleLeftClick(r, c);
+					}
 					else if (SwingUtilities.isRightMouseButton(e)) {
 						rightClick(r, c);
 						rightClick(r, c);
+						beep2();
 					}
 				}
-				else if (SwingUtilities.isLeftMouseButton(e))
+				else if (SwingUtilities.isLeftMouseButton(e)) {
 					leftClick(r, c);
-				else if (SwingUtilities.isRightMouseButton(e))
+					beep();
+				}
+				else if (SwingUtilities.isRightMouseButton(e)) {
 					rightClick(r, c);
+					beep2();
+				}
 			}
 
 			@Override
@@ -375,6 +412,20 @@ public class Grid extends JPanel {
 		this.timer.stop();
 		this.gameStatus = GameStatus.LOST;
 		this.repaint();
+		
+		try {
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("boom.wav").getAbsoluteFile());
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioInputStream);
+			clip.start();
+		} catch (IOException e) {
+			System.out.println("Caught IO Exception");
+		} catch (UnsupportedAudioFileException e) {
+			System.out.println("Caught Unsupported Audio File Exception"); 
+	    } catch (LineUnavailableException e) {
+			System.out.println("Caught Line Unavailable Exception");
+		}
+	
 		try {
 			this.writeGrid();
 		} catch (IOException e) {
@@ -382,6 +433,7 @@ public class Grid extends JPanel {
 		}
 		
 		JFrame lose = new JFrame();
+		lose.setLocationRelativeTo(this);
 			
 		JLabel nameLabel = new JLabel("<html>Oh no! you lost the game.");
 	    nameLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
@@ -442,6 +494,20 @@ public class Grid extends JPanel {
 		this.updateStatus();
 		this.timer.stop();
 		this.repaint();
+		
+		try {
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("tada.wav").getAbsoluteFile());
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioInputStream);
+			clip.start();
+		} catch (IOException e) {
+			System.out.println("Caught IO Exception");
+		} catch (UnsupportedAudioFileException e) {
+			System.out.println("Caught Unsupported Audio File Exception"); 
+	    } catch (LineUnavailableException e) {
+			System.out.println("Caught Line Unavailable Exception");
+		}
+		
 		try {
 			if (this.name.equals("user") && this.isHighScore()) {
 				JLabel nameLabel = new JLabel("<html>Congrats! You got a high score.<br>"
@@ -453,7 +519,7 @@ public class Grid extends JPanel {
 				JPanel namePanel = new JPanel();
 				namePanel.add(nameLabel);
 				namePanel.add(nameField);
-				
+			    
 				int result = JOptionPane.showConfirmDialog(
 						null,
 						namePanel,
@@ -753,7 +819,6 @@ public class Grid extends JPanel {
 	
 	public void writeGrid() throws IOException {
 		PrintWriter writer = new PrintWriter("previous.txt");
-		writer.println(this.difficultyToString());
 		writer.println(this.getRows());
 		writer.println(this.getCols());
 		for (int r = 0; r < this.getRows(); r++) {
@@ -768,14 +833,6 @@ public class Grid extends JPanel {
 	public static char[][] readGrid() throws IOException {
 		try {
 			BufferedReader r = new BufferedReader(new FileReader("previous.txt"));
-			String diff = r.readLine();
-			Difficulty d = Difficulty.CUSTOM;
-			if (diff.equals(Difficulty.BEGINNER.toString()))
-				d = Difficulty.BEGINNER;
-			if (diff.equals(Difficulty.INTERMEDIATE.toString()))
-				d = Difficulty.INTERMEDIATE;
-			if (diff.equals(Difficulty.EXPERT.toString()))
-				d = Difficulty.EXPERT;
 			
 			String rows = r.readLine();
 			int row = Integer.parseInt(rows);
@@ -798,6 +855,7 @@ public class Grid extends JPanel {
 					currRow ++;
 				}
 			}
+			r.close();
 			return arr;
 		} catch (NoSuchFileException e) {
 			System.out.println("Caught No Such File Exception");

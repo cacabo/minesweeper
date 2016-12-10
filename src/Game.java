@@ -32,7 +32,7 @@ public class Game implements Runnable {
 
 		// Top-level frame in which game components live
 		final JFrame frame = new JFrame("Minesweeper");
-		//frame.setLocation(grid.scale() * 8, grid.scale() * 8);
+		frame.setLocation(200, 200);
 
 		EmptyBorder empty = new EmptyBorder(0, 0, 0, 0);
 		EmptyBorder paddingWide = new EmptyBorder(6, 18, 6, 18);
