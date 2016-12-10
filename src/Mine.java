@@ -35,6 +35,9 @@ public class Mine extends Box implements Comparable<Box> {
 	}
 	
 	public void draw(Graphics g) {
+		System.out.println("Grid should not be null:");
+		System.out.println(grid == null);
+		
 		int x = this.getPosition().getCol() * grid.scale();
 		int y = this.getPosition().getRow() * grid.scale();
 		if (this.hidden())

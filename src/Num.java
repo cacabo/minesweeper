@@ -7,6 +7,11 @@ public class Num extends Box implements Comparable<Box> {
 		super(grid, position);
 		this.numMines = grid.mineCount(position);
 	}
+	
+	public Num(Grid grid, Position position, int num) {
+		super(grid, position);
+		this.numMines = num;
+	}
 
 	public void leftClick() {
 		if (this.grid.won() || this.grid.lost())
@@ -54,7 +59,12 @@ public class Num extends Box implements Comparable<Box> {
 		return this.getPosition().compareTo(b.getPosition());
 	}
 	
+	static int test = 0;
 	public void draw(Graphics g) {
+		System.out.println("Graphics are null: " + test);
+		test++;
+		System.out.println(g == null);
+		
 		int x = this.getPosition().getCol() * grid.scale();
 		int y = this.getPosition().getRow() * grid.scale();
 		if (this.hidden())

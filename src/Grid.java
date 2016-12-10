@@ -4,20 +4,21 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,23 +51,15 @@ public class Grid extends JPanel {
 	public enum Difficulty {BEGINNER, INTERMEDIATE, EXPERT, CUSTOM};
 	private Difficulty difficulty;
 	
-	Timer timer = new Timer(1000, new ActionListener() {
+	private Timer timer = new Timer(1000, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			incTime();
 		}
 	});
 
-	// Figure out how to implement the timer,
-	// timer should be started * * * upon generation * * *
-
-	public Grid(int rows, int columns, int numMines, JLabel status, JLabel minesRemaining, JLabel timeStatus) {
-		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-		
-		this.grid = new Box[rows][columns];
-		this.numMines = numMines;
+	private void jLabelHelper(JLabel status, JLabel minesRemaining, JLabel timeStatus) {
 		this.numMarked = 0;
 		this.gameStatus = GameStatus.NOT_STARTED;
-		this.difficulty = Difficulty.CUSTOM;
 		this.status = status;
 		this.updateStatus();
 		this.minesRemaining = minesRemaining;
@@ -75,9 +68,9 @@ public class Grid extends JPanel {
 		this.timeStatus = timeStatus;
 		this.updateTime();
 		this.numRevealed = 0;
-		
-		setFocusable(true);
-		
+	}
+	
+	public void mouseListenerHelper() {
 		this.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -109,15 +102,18 @@ public class Grid extends JPanel {
 			}
 		});
 	}
-	// Only works for BEGINNER, intermediate, expert
+
+	public Grid(int rows, int columns, int numMines, JLabel status, JLabel minesRemaining, JLabel timeStatus) {
+//		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+		this.grid = new Box[rows][columns];
+		this.numMines = numMines;
+		this.difficulty = Difficulty.CUSTOM;
+		this.jLabelHelper(status, minesRemaining, timeStatus);
+		this.mouseListenerHelper();
+	}
 	
-	//
-	//
-	//
-	//
-	//
 	public Grid(Difficulty d, JLabel status, JLabel minesRemaining, JLabel timeStatus) {
-		setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+//		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		
 		if (d == Difficulty.BEGINNER) {
 			this.grid = new Box[8][8];
@@ -127,48 +123,35 @@ public class Grid extends JPanel {
 			this.grid = new Box[16][16];
 			this.numMines = 40;
 		}
-		else { //Assumes expert
+		else {
 			this.grid = new Box[16][32];
 			this.numMines = 99;
 		}
-		this.numMarked = 0;
-		this.gameStatus = GameStatus.NOT_STARTED;
 		this.difficulty = d;
-		this.status = status;
-		this.updateStatus();
-		this.minesRemaining = minesRemaining;
-		this.updateMinesRemaining();
-		this.numRevealed = 0;
-		this.time = 0;
-		this.timeStatus = timeStatus;
-		this.updateTime();
-		//Perhaps use user input?
-		
-		setFocusable(true);
-		
-		this.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				int x = e.getX();
-				int c = (int) Math.floor((double)x / scale());
-				int y = e.getY();
-				int r = (int) Math.floor((double)y / scale());
-				if (r >= 0 && r < grid.length && c >= 0 && c < grid[0].length) {
-					Box b = grid[r][c];
-				
-					if (SwingUtilities.isLeftMouseButton(e)) {
-						if (b == null)
-							generate(r, c);
-						b = grid[r][c];
-						b.leftClick();
-					}
-					else if (SwingUtilities.isRightMouseButton(e))
-						if (b != null) {
-							b.rightClick();
-						}
-				}
-			}
-		});
+		this.jLabelHelper(status, minesRemaining, timeStatus);
+		this.mouseListenerHelper();
 	}
+	
+//	public Grid(char[][] arr, Difficulty d, JLabel status, JLabel minesRemaining, JLabel timeStatus) {
+//		System.out.println("Arr length: " + arr.length);
+//		System.out.println(arr[0] == null);
+//		this.grid = new Box[arr.length][arr[0].length];
+//		for (int r = 0; r < arr.length; r++) {
+//			for (int c = 0; c < arr[0].length; c++) {
+//				char s = arr[r][c];
+//				Position p = new Position(r, c);
+//				if (s == 'M')
+//					this.grid[r][c] = new Mine(this, p);
+//				for (int num = 0; num <= 8; num++) {
+//					if (s == 48 + num)
+//						this.grid[r][c] = new Num(this, p, num);
+//				}
+//			}
+//		}
+//		this.difficulty = d;
+//		this.jLabelHelper(status, minesRemaining, timeStatus);
+//		this.mouseListenerHelper();
+//	}
 	
 	private void resetHelper() {
 		this.time = 0;
@@ -186,9 +169,6 @@ public class Grid extends JPanel {
 	public void reset() {
 		this.grid = new Box[this.getRows()][this.getCols()];
 		this.resetHelper();
-//		this.repaint();
-		// Make sure that this component has the keyboard focus
-		// requestFocusInWindow();
 	}
 	
 	public void reset(Difficulty d) {
@@ -199,16 +179,36 @@ public class Grid extends JPanel {
 		this.difficulty = g.difficulty;
 		this.numMines = g.numMines;
 		this.resetHelper();
-//		this.repaint();
 	}
 	
 	public void reset(int row, int col, int mines) {
-		Grid g = new Grid(row, col, mines, new JLabel("Game Not Started"), new JLabel("Mines left: 10"), new JLabel("Time: 0"));
-		this.grid = g.grid;
+		this.grid = new Box[row][col];
 		this.difficulty = Difficulty.CUSTOM;
 		this.numMines = mines;
 		this.resetHelper();
-//		this.repaint();
+	}
+	
+	public void replay() throws IOException {
+		char[][] arr = Grid.readGrid();
+		this.grid = new Box[arr.length][arr[0].length];
+		for (int r = 0; r < arr.length; r++) {
+			for (int c = 0; c < arr[0].length; c++) {
+				char s = arr[r][c];
+				Position p = new Position(r, c);
+				if (s == 'M')
+					this.grid[r][c] = new Mine(this, p);
+				for (int num = 0; num <= 8; num++) {
+					if (s == 48 + num)
+						this.grid[r][c] = new Num(this, p, num);
+				}
+			}
+		}
+		
+		
+		this.resetHelper();
+		
+		System.out.println("\nGraphics null in constructor: ");
+		System.out.println(this.getGraphics() == null);
 	}
 	
 	public void incNumRevealed() {
@@ -276,6 +276,8 @@ public class Grid extends JPanel {
 			Box b = this.grid[row][col];
 			if (b == null)
 				this.generate(row, col);
+			if (this.gameStatus == GameStatus.NOT_STARTED)
+				this.gameStatus = GameStatus.IN_PROGRESS;
 			b = this.grid[row][col];
 			b.leftClick();
 		}
@@ -349,6 +351,7 @@ public class Grid extends JPanel {
 
 	// When a user loses the whole board should be revealed
 	public void lose() {
+		System.out.println("Game lost");
 		for (int r = 0; r < grid.length; r++)
 			for (int c = 0; c < grid[0].length; c++) {
 				Box b = this.grid[r][c];
@@ -357,19 +360,66 @@ public class Grid extends JPanel {
 		this.timer.stop();
 		this.gameStatus = GameStatus.LOST;
 		this.repaint();
+		try {
+			this.writeGrid();
+		} catch (IOException e) {
+			System.out.println("Exception caught while writing!");
+		}
+		
+		JFrame lose = new JFrame();
+			
+		JLabel nameLabel = new JLabel("<html>Oh no! you lost the game.");
+	    nameLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+			
+		JButton replay = new JButton("Replay");
+		replay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					replay();
+				} catch (IOException exception) {
+					System.out.println("Caught IO Exception");
+				}
+				lose.dispose();
+			}
+		});
+		
+		JButton reset = new JButton("New Game");
+		reset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				reset();
+				lose.dispose();
+			}
+		});
+		
+		JButton quit = new JButton("Quit");
+		quit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		
+		JPanel buttons = new JPanel();
+		buttons.add(replay);
+		buttons.add(reset);
+		buttons.add(quit);
+		
+		JPanel wrapper = new JPanel();
+		wrapper.setAlignmentY(TOP_ALIGNMENT);
+		wrapper.add(nameLabel);
+		wrapper.add(buttons);
+		
+		lose.add(nameLabel);
+		lose.add(buttons);
+		lose.pack();
+		lose.setVisible(true);
+		
+		System.out.println("Lost method completed");
 	}
 	
 	public boolean hasWon() {
 		if (this.lost()) {
 			return false;
 		}
-//		for (int r = 0; r < grid.length; r++)
-//			for (int c = 0; c < grid[0].length; c++) {
-//				Box b = this.grid[r][c];
-//				if (b == null || (b instanceof Num && !b.revealed()))
-//					return false;
-//			}
-//		this.gameStatus = GameStatus.WON;
 		int nums = this.getRows() * this.getCols() - this.numMines;
 		return nums == this.numRevealed;
 	}
@@ -379,7 +429,6 @@ public class Grid extends JPanel {
 		this.updateStatus();
 		this.timer.stop();
 		this.repaint();
-		
 		try {
 			if (this.name.equals("user") && this.isHighScore()) {
 				JLabel nameLabel = new JLabel("<html>Congrats! You got a high score.<br>"
@@ -574,12 +623,10 @@ public class Grid extends JPanel {
 		if (this.lost()) {
 			g.setColor(new Color(255, 0, 0, 48));
 			g.fillRect(0, 0, this.getCols() * scale(), this.getRows() * scale());
-			repaint();
 		}
 		else if (this.won()) {
 			g.setColor(new Color(0, 255, 0, 48));
 			g.fillRect(0, 0, this.getCols() * scale(), this.getRows() * scale());
-			repaint();
 		}
 	}
 
@@ -689,6 +736,61 @@ public class Grid extends JPanel {
 		catch (IOException e) {
 		}
 		return names;
+	}
+	
+	public void writeGrid() throws IOException {
+		PrintWriter writer = new PrintWriter("previous.txt");
+		writer.println(this.difficultyToString());
+		writer.println(this.getRows());
+		writer.println(this.getCols());
+		for (int r = 0; r < this.getRows(); r++) {
+			for (int c = 0; c < this.getCols(); c++) {
+				writer.print(this.grid[r][c].toString());
+			}
+			writer.println();
+		}
+		writer.close();
+	}
+	
+	public static char[][] readGrid() throws IOException {
+		try {
+			BufferedReader r = new BufferedReader(new FileReader("previous.txt"));
+			String diff = r.readLine();
+			Difficulty d = Difficulty.CUSTOM;
+			if (diff.equals(Difficulty.BEGINNER.toString()))
+				d = Difficulty.BEGINNER;
+			if (diff.equals(Difficulty.INTERMEDIATE.toString()))
+				d = Difficulty.INTERMEDIATE;
+			if (diff.equals(Difficulty.EXPERT.toString()))
+				d = Difficulty.EXPERT;
+			
+			String rows = r.readLine();
+			int row = Integer.parseInt(rows);
+			String cols = r.readLine();
+			int col = Integer.parseInt(cols);
+			
+			char[][] arr = new char[row][col];
+				
+			boolean done = false;
+			
+			int currRow = 0;
+			
+			while(!done) {
+				String str = r.readLine();
+				if (str == null)
+					done = true;
+				else {
+					for (int i = 0; i < str.length(); i++)
+						arr[currRow][i] = str.charAt(i);
+					currRow ++;
+				}
+			}
+			return arr;
+		} catch (NoSuchFileException e) {
+			System.out.println("No such file");
+		}
+		System.out.println("Program should not reach here");
+		return new char[0][0];
 	}
 	
 //	public static void main(String[] args) {
