@@ -15,6 +15,10 @@ public class Mine extends Box implements Comparable<Box> {
 		this.paint();
 	}
 	
+	public void doubleLeftClick() {
+		this.leftClick();
+	}
+	
 	public String toStringNoReveal() {
 		if (this.revealed())
 			return "M";
@@ -35,9 +39,6 @@ public class Mine extends Box implements Comparable<Box> {
 	}
 	
 	public void draw(Graphics g) {
-		System.out.println("Grid should not be null:");
-		System.out.println(grid == null);
-		
 		int x = this.getPosition().getCol() * grid.scale();
 		int y = this.getPosition().getRow() * grid.scale();
 		if (this.hidden())

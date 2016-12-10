@@ -78,8 +78,15 @@ public class Grid extends JPanel {
 				int c = (int) Math.floor(x / scale());
 				int y = e.getY();
 				int r = (int) Math.floor(y / scale());
-				
-				if (SwingUtilities.isLeftMouseButton(e))
+				if (e.getClickCount() == 2) {
+					if (SwingUtilities.isLeftMouseButton(e))
+						doubleLeftClick(r, c);
+					else if (SwingUtilities.isRightMouseButton(e)) {
+						rightClick(r, c);
+						rightClick(r, c);
+					}
+				}
+				else if (SwingUtilities.isLeftMouseButton(e))
 					leftClick(r, c);
 				else if (SwingUtilities.isRightMouseButton(e))
 					rightClick(r, c);
@@ -206,9 +213,6 @@ public class Grid extends JPanel {
 		
 		
 		this.resetHelper();
-		
-		System.out.println("\nGraphics null in constructor: ");
-		System.out.println(this.getGraphics() == null);
 	}
 	
 	public void incNumRevealed() {
@@ -283,6 +287,18 @@ public class Grid extends JPanel {
 		}
 	}
 	
+	public void doubleLeftClick(int row, int col) {
+		if (row >= 0 && col >= 0 && row < this.getRows() && col < this.getCols()) {
+			Box b = this.grid[row][col];
+			if (b == null)
+				this.generate(row, col);
+			if (this.gameStatus == GameStatus.NOT_STARTED)
+				this.gameStatus = GameStatus.IN_PROGRESS;
+			b = this.grid[row][col];
+			b.doubleLeftClick();
+		}
+	}
+	
 	public void rightClick(int row, int col) {
 		if (row >= 0 && col >= 0 && row < this.getRows() && col < this.getCols()) {
 			Box b = this.grid[row][col];
@@ -351,7 +367,6 @@ public class Grid extends JPanel {
 
 	// When a user loses the whole board should be revealed
 	public void lose() {
-		System.out.println("Game lost");
 		for (int r = 0; r < grid.length; r++)
 			for (int c = 0; c < grid[0].length; c++) {
 				Box b = this.grid[r][c];
@@ -363,7 +378,7 @@ public class Grid extends JPanel {
 		try {
 			this.writeGrid();
 		} catch (IOException e) {
-			System.out.println("Exception caught while writing!");
+			System.out.println("Caught IO Exception");
 		}
 		
 		JFrame lose = new JFrame();
@@ -412,8 +427,6 @@ public class Grid extends JPanel {
 		lose.add(buttons);
 		lose.pack();
 		lose.setVisible(true);
-		
-		System.out.println("Lost method completed");
 	}
 	
 	public boolean hasWon() {
@@ -787,9 +800,8 @@ public class Grid extends JPanel {
 			}
 			return arr;
 		} catch (NoSuchFileException e) {
-			System.out.println("No such file");
+			System.out.println("Caught No Such File Exception");
 		}
-		System.out.println("Program should not reach here");
 		return new char[0][0];
 	}
 	

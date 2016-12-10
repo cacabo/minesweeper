@@ -9,7 +9,7 @@ public abstract class Box implements Comparable<Box> {
 
 	  protected final Grid grid;
 	  private final Position position;
-	  public enum BoxState {HIDDEN, REVEALED, MARKED, UNSURE};
+	  public enum BoxState {HIDDEN, REVEALED, MARKED, UNSURE, CHECKED};
 	  private BoxState state;
 	  
 	  public Box(Grid grid, Position position) {
@@ -25,7 +25,6 @@ public abstract class Box implements Comparable<Box> {
 					img = ImageIO.read(new File(imgFile));
 				}
 			} catch (IOException e) {
-				System.out.println("Internal Error:" + e.getMessage());
 			}
 			return img;
 		}
@@ -35,6 +34,8 @@ public abstract class Box implements Comparable<Box> {
 	  public abstract String toStringNoReveal();
 	  
 	  public abstract void leftClick();
+	  
+	  public abstract void doubleLeftClick();
 	  
 	  public void rightClick() {
 		  if (this.grid.won() || this.grid.lost())
@@ -58,6 +59,9 @@ public abstract class Box implements Comparable<Box> {
 		  return position;
 	  }
 	  
+	  public void setState(BoxState state) {
+		  this.state = state;
+	  }
 	  public void reveal() {
 		  this.state = BoxState.REVEALED;
 	  }
@@ -76,6 +80,10 @@ public abstract class Box implements Comparable<Box> {
 	  
 	  public boolean unsure() {
 		  return this.state == BoxState.UNSURE;
+	  }
+	  
+	  public boolean checked() {
+		  return this.state == BoxState.CHECKED;
 	  }
 	  
 	  public String boxState() {

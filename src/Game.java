@@ -81,7 +81,7 @@ public class Game implements Runnable {
 		// an instance of ActionListener with its actionPerformed()
 		// method overridden. When the button is pressed,
 		// actionPerformed() will be called.
-		final JButton reset = new JButton("Reset");
+		final JButton reset = new JButton("New Game");
 		reset.setFont(new Font("Sans Serif", Font.PLAIN, 16));
 		reset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
