@@ -35,15 +35,15 @@ public class Mine extends Box implements Comparable<Box> {
 	}
 	
 	public void draw(Graphics g) {
-		int x = this.getPosition().getCol() * Grid.scale;
-		int y = this.getPosition().getRow() * Grid.scale;
+		int x = this.getPosition().getCol() * grid.scale();
+		int y = this.getPosition().getRow() * grid.scale();
 		if (this.hidden())
-			g.drawImage(createImage("hidden.png"), x, y, Grid.scale, Grid.scale, null);
+			g.drawImage(createImage("hidden.png"), x, y, grid.scale(), grid.scale(), null);
 		else if (this.marked())
-			g.drawImage(createImage("marked.png"), x, y, Grid.scale, Grid.scale, null);
+			g.drawImage(createImage("marked.png"), x, y, grid.scale(), grid.scale(), null);
 		else if (this.unsure())
-			g.drawImage(createImage("unsure.png"), x, y, Grid.scale, Grid.scale, null);
+			g.drawImage(createImage("unsure.png"), x, y, grid.scale(), grid.scale(), null);
 		else
-			g.drawImage(createImage("mine.png"), x, y, Grid.scale, Grid.scale, null);
+			g.drawImage(createImage("mine.png"), x, y, grid.scale(), grid.scale(), null);
 	}
 }

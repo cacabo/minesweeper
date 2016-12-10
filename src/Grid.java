@@ -28,7 +28,14 @@ import javax.swing.Timer;
 @SuppressWarnings("serial")
 public class Grid extends JPanel {
 
-	public static int scale = 64;
+	public int scale() {
+		if (this.getRows() < 16)
+			return 64;
+		if (this.getRows() < 32)
+			return 48;
+		return 32;
+	}
+	
 	private Box[][] grid;
 	private int numMines;
 	private int numMarked;
@@ -75,9 +82,9 @@ public class Grid extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int x = e.getX();
-				int c = (int) Math.floor(x / scale);
+				int c = (int) Math.floor(x / scale());
 				int y = e.getY();
-				int r = (int) Math.floor(y / scale);
+				int r = (int) Math.floor(y / scale());
 				
 				if (SwingUtilities.isLeftMouseButton(e))
 					leftClick(r, c);
@@ -142,9 +149,9 @@ public class Grid extends JPanel {
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				int x = e.getX();
-				int c = (int) Math.floor((double)x / scale);
+				int c = (int) Math.floor((double)x / scale());
 				int y = e.getY();
-				int r = (int) Math.floor((double)y / scale);
+				int r = (int) Math.floor((double)y / scale());
 				if (r >= 0 && r < grid.length && c >= 0 && c < grid[0].length) {
 					Box b = grid[r][c];
 				
@@ -173,12 +180,13 @@ public class Grid extends JPanel {
 		this.updateStatus();
 		this.updateMinesRemaining();
 		this.updateTime();
+		this.repaint();
 	}
 	
 	public void reset() {
 		this.grid = new Box[this.getRows()][this.getCols()];
 		this.resetHelper();
-		this.repaint();
+//		this.repaint();
 		// Make sure that this component has the keyboard focus
 		// requestFocusInWindow();
 	}
@@ -191,7 +199,7 @@ public class Grid extends JPanel {
 		this.difficulty = g.difficulty;
 		this.numMines = g.numMines;
 		this.resetHelper();
-		this.repaint();
+//		this.repaint();
 	}
 	
 	public void reset(int row, int col, int mines) {
@@ -200,7 +208,7 @@ public class Grid extends JPanel {
 		this.difficulty = Difficulty.CUSTOM;
 		this.numMines = mines;
 		this.resetHelper();
-		this.repaint();
+//		this.repaint();
 	}
 	
 	public void incNumRevealed() {
@@ -555,9 +563,9 @@ public class Grid extends JPanel {
 			for (int c = 0; c < this.getCols(); c++) {
 				Box b = grid[r][c];
 				if (b == null) {
-					int x = c * scale;
-					int y = r * scale;
-					g.drawImage(Box.createImage("hidden.png"), x, y, scale, scale, null);
+					int x = c * scale();
+					int y = r * scale();
+					g.drawImage(Box.createImage("hidden.png"), x, y, scale(), scale(), null);
 				}
 				else
 					b.draw(g);
@@ -565,25 +573,19 @@ public class Grid extends JPanel {
 		}
 		if (this.lost()) {
 			g.setColor(new Color(255, 0, 0, 48));
-			g.fillRect(0, 0, this.getCols() * scale, this.getRows() * scale);
+			g.fillRect(0, 0, this.getCols() * scale(), this.getRows() * scale());
 			repaint();
 		}
 		else if (this.won()) {
 			g.setColor(new Color(0, 255, 0, 48));
-			g.fillRect(0, 0, this.getCols() * scale, this.getRows() * scale);
+			g.fillRect(0, 0, this.getCols() * scale(), this.getRows() * scale());
 			repaint();
 		}
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(this.getCols() * scale, this.getRows() * scale);
-	}
-	
-	public void instructions() {
-		/*
-		 * 
-		 */
+		return new Dimension(this.getCols() * scale(), this.getRows() * scale());
 	}
 	
 	private String scoreToString() {
@@ -609,7 +611,7 @@ public class Grid extends JPanel {
 		}
 		int index = 0;
 		for (int i : ints) {
-			if (this.time > i)
+			if (this.time >= i)
 				index++;
 		}
 		if (index < strings.size()) {
@@ -632,7 +634,7 @@ public class Grid extends JPanel {
 		writer.close();
 	}
 	
-	private static List<String> highScoresToStrings(Difficulty d) throws IOException {
+	public static List<String> highScoresToStrings(Difficulty d) throws IOException {
 		List<String> l = new LinkedList<String>();
 		BufferedReader r = new BufferedReader(new FileReader(d.toString() + ".txt"));
 		try {
@@ -657,7 +659,7 @@ public class Grid extends JPanel {
 		return highScoresToInts(strings);
 	}
 	
-	private static List<Integer> highScoresToInts(List<String> strings) throws IOException {
+	public static List<Integer> highScoresToInts(List<String> strings) throws IOException {
 		List<Integer> ints = new LinkedList<Integer>();
 		try {
 			for (String s : strings) {
@@ -671,6 +673,22 @@ public class Grid extends JPanel {
 		catch (IOException e) {
 		}
 		return ints;
+	}
+	
+	public static List<String> highScoresToNames(List<String> strings) throws IOException {
+		List<String> names = new LinkedList<String>();
+		try {
+			for (String s : strings) {
+				int i = s.indexOf(",");
+				if (i == -1)
+					throw new IOException();
+				String name = s.substring(0, i);
+				names.add(name);
+			}
+		}
+		catch (IOException e) {
+		}
+		return names;
 	}
 	
 //	public static void main(String[] args) {

@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -30,11 +32,12 @@ public class Game implements Runnable {
 
 		// Top-level frame in which game components live
 		final JFrame frame = new JFrame("Minesweeper");
-		frame.setLocation(Grid.scale * 8, Grid.scale * 8);
+		//frame.setLocation(grid.scale() * 8, grid.scale() * 8);
 
 		EmptyBorder empty = new EmptyBorder(0, 0, 0, 0);
-		EmptyBorder paddingWide = new EmptyBorder(5, 20, 5, 20);
+		EmptyBorder paddingWide = new EmptyBorder(6, 18, 6, 18);
 		EmptyBorder padding = new EmptyBorder(18, 18, 18, 18);
+		Font normalFont = new Font("Sans Serif", Font.PLAIN, 18);
 		
 		// Status panel
 		
@@ -45,23 +48,27 @@ public class Game implements Runnable {
 		
 		final JLabel status = new JLabel("Game Not Started");
 		status.setBorder(paddingWide);
-		status.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		status.setFont(normalFont);
 		status_panel.add(status);
 		
 		final JLabel minesRemaining = new JLabel("Mines left: 10");
 		minesRemaining.setBorder(paddingWide);
-		minesRemaining.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		minesRemaining.setFont(normalFont);
 		status_panel.add(minesRemaining);
 		
 		final JLabel timeStatus = new JLabel("Time: 0");
 		timeStatus.setBorder(paddingWide);
-		timeStatus.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		timeStatus.setFont(normalFont);
 		status_panel.add(timeStatus);
 
 		// Main playing area
+		final JPanel gridPanel = new JPanel();
+		gridPanel.setBorder(paddingWide);
+		
 		final Grid grid = new Grid(Grid.Difficulty.BEGINNER, status, minesRemaining, timeStatus);
 		grid.setBorder(empty);
-		frame.add(grid, BorderLayout.CENTER);
+		gridPanel.add(grid);
+		frame.add(gridPanel, BorderLayout.CENTER);
 
 		// Reset button
 		final JPanel control_panel = new JPanel();
@@ -82,7 +89,8 @@ public class Game implements Runnable {
 			}
 		});
 		
-		final int addH = 90;
+		final int addW = 46;
+		final int addH = 216;
 		
 		final JButton beginner = new JButton("Beginner");
 		beginner.setFont(new Font("Sans Serif", Font.PLAIN, 16));
@@ -99,24 +107,24 @@ public class Game implements Runnable {
 		
 		beginner.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.setSize(new Dimension((int)(Grid.scale * 8.5), (int)(Grid.scale * 10) + addH));
 				grid.reset(Grid.Difficulty.BEGINNER);
+				frame.setSize(new Dimension((int)(grid.scale() * 8.5) + addW, (int)(grid.scale() * 8.8) + addH));
 				toggleDifficultyButtons(beginner, intermediate, expert, custom);
 			}
 		});
 		
 		intermediate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.setSize(new Dimension((int)(Grid.scale * 16.5), Grid.scale * 18 + addH));
 				grid.reset(Grid.Difficulty.INTERMEDIATE);
+				frame.setSize(new Dimension((int)(grid.scale() * 16.5) + addW, (int)(grid.scale() * 16.5) + addH));
 				toggleDifficultyButtons(intermediate, beginner, expert, custom);
 			}
 		});
 		
 		expert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.setSize(new Dimension((int)(Grid.scale * 32.5), Grid.scale * 18 + addH));
 				grid.reset(Grid.Difficulty.EXPERT);
+				frame.setSize(new Dimension((int)(grid.scale() * 32.5) + addW, (int)(grid.scale() * 16.5) + addH));
 				toggleDifficultyButtons(expert, beginner, intermediate, custom);
 			}
 		});
@@ -124,11 +132,11 @@ public class Game implements Runnable {
 		custom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JLabel r1 = new JLabel("Number of rows:  ");
-				r1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+				r1.setFont(normalFont);
 				JLabel c1 = new JLabel("Number of columns:  ");
-				c1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+				c1.setFont(normalFont);
 				JLabel m1 = new JLabel("Number of mines:  ");
-				m1.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+				m1.setFont(normalFont);
 						
 				JTextField r2 = new JTextField(2);
 				JTextField c2 = new JTextField(2);
@@ -166,7 +174,8 @@ public class Game implements Runnable {
 						int mines = Integer.parseInt(m2.getText());
 						if (row < 4 || row > 48 || col < 4 || col > 48 || mines < 0 || mines > row * col - 9)
 							throw new IllegalArgumentException();
-						frame.setSize(new Dimension((int)(Grid.scale * (row + .5)), Grid.scale * (col + 2) + addH));
+						frame.setSize(new Dimension((int)(grid.scale() * (col + .5)) + addW,
+								                          grid.scale() * (row + 2) + addH));
 						grid.reset(row, col, mines);
 						toggleDifficultyButtons(custom, beginner, intermediate, expert);
 					} catch(Exception error) {
@@ -187,9 +196,51 @@ public class Game implements Runnable {
 		final JButton highscores = new JButton("Highscores");
 		highscores.setFont(new Font("Sans Serif", Font.PLAIN, 18));
 		
+		highscores.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				final JFrame highScoresFrame = new JFrame("Highscores");
+				highScoresFrame.setLocation(frame.getMousePosition());
+				
+				final JLabel title = new JLabel("Minesweeper Highscores:");
+				title.setBorder(paddingWide);
+				title.setFont(new Font("Sans Serif", Font.BOLD, 22));
+				highScoresFrame.add(title, BorderLayout.NORTH);
+				
+				final JPanel difficulties = new JPanel();
+				
+				final JLabel beginnerScores = new JLabel(Game.highScoreOutput(Grid.Difficulty.BEGINNER));
+				beginnerScores.setBorder(paddingWide);
+				beginnerScores.setFont(normalFont);
+				difficulties.add(beginnerScores);
+				
+				final JLabel intermediateScores = new JLabel(Game.highScoreOutput(Grid.Difficulty.INTERMEDIATE));
+				intermediateScores.setBorder(paddingWide);
+				intermediateScores.setFont(normalFont);
+				difficulties.add(intermediateScores);
+				
+				final JLabel expertScores = new JLabel(Game.highScoreOutput(Grid.Difficulty.EXPERT));
+				expertScores.setBorder(paddingWide);
+				expertScores.setFont(normalFont);
+				expertScores.setVerticalAlignment(JLabel.TOP);
+				expertScores.setVerticalTextPosition(JLabel.TOP);
+				difficulties.add(expertScores);
+				
+				final JLabel customScores = new JLabel(Game.highScoreOutput(Grid.Difficulty.CUSTOM));
+				customScores.setBorder(paddingWide);
+				customScores.setFont(normalFont);
+				customScores.setVerticalAlignment(JLabel.TOP);
+				customScores.setVerticalTextPosition(JLabel.TOP);
+				difficulties.add(customScores);
+				
+				highScoresFrame.add(difficulties);
+				highScoresFrame.pack();
+				highScoresFrame.setVisible(true);
+			}
+		});
+		
 		
 		final JButton instructions = new JButton("Instructions");
-		instructions.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+		instructions.setFont(normalFont);
 		
 		instructions.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -224,7 +275,7 @@ public class Game implements Runnable {
 				);
 				
 				text.setBorder(padding);
-				text.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+				text.setFont(normalFont);
 				
 				JPanel playContainer = new JPanel();
 				playContainer.setBorder(padding);
@@ -240,41 +291,8 @@ public class Game implements Runnable {
 				playContainer.add(play);
 				instr.add(playContainer, BorderLayout.SOUTH);
 				
-				//instr.getGraphics().setFont(instr.getGraphics().getFont().deriveFont((float) 18));
-				//frame.setLocation(Grid.scale * 8, Grid.scale * 8);
-//				final JLabel title = new JLabel("<html>M I N E S W E E P E R<br><br></html>");
-//				title.setFont(new Font("Serif", Font.PLAIN, 18));
-//				final JLabel about = new JLabel("Built by Cameron Cabo for my CIS 120 final project. Enjoy!");
-//				final JLabel text = new JLabel("<html>Instructions:<br><br></html>");
-//				final JLabel how = new JLabel("How to play:");
-//				final JLabel steps = new JLabel("<html>Left click anywhere on the board to start the game.<br>"
-//												+ "From there, left click any unrevealed box to see what's below!<br>"
-//												+ "Right click to mark unrevealed boxes; you can mark them as mines<br>"
-//												+ "or as unsure, with a question mark, to help you count.<br>"
-//												+ "If you left click a number already touching as many marked mines<br>"
-//												+ "as it actually touches, then all adjacent unmarked boxes will be<br>"
-//												+ "revealed.</html>");
-				
-				
-//				instr.add(text, BorderLayout.NORTH);
-//				instr.add(about, BorderLayout.AFTER_LINE_ENDS);
-//				instr.add(how, BorderLayout.AFTER_LINE_ENDS);
-//				instr.add(steps, BorderLayout.AFTER_LINE_ENDS);
-				
-//				instr.setLayout(new GridBagLayout());
-//				GridBagConstraints gbc = new GridBagConstraints();
-//				gbc.gridwidth = GridBagConstraints.REMAINDER;
-//				
-//				instr.add(title, gbc);
-//				instr.add(about, gbc);
-//				instr.add(text,gbc);
-//				instr.add(how, gbc);
-//				instr.add(steps, gbc);
-				
 				
 				instr.pack();
-				//instr.setSize(128, 256);
-				//instr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				instr.setVisible(true);
 			}
 		});
@@ -307,6 +325,28 @@ public class Game implements Runnable {
 	 * specified in Game and runs it IMPORTANT: Do NOT delete! You MUST include
 	 * this in the final submission of your game.
 	 */
+	private static String highScoreOutput(Grid.Difficulty d) {
+		String diff = d.toString().toLowerCase();
+		diff = diff.substring(0, 1).toUpperCase() + diff.substring(1);
+		String output = "<html><b>" + diff + ":</b><ol>";
+		try {
+			List<String> all = Grid.highScoresToStrings(d);
+			List<String> names = Grid.highScoresToNames(all);
+			List<Integer> scores = Grid.highScoresToInts(all);
+			for (int i = 0; i < names.size(); i++)
+				output += "<li>" + names.get(i) + ":  " + scores.get(i) + "</li>";
+			int index = names.size();
+			while (index < 5) {
+				index++;
+				output += "<li>-</li>";
+			}
+		} catch (IOException e) {
+		}
+		output += "</ol></html>";
+		
+		return output;
+	}
+	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Game());
 	}
