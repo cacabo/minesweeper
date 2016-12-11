@@ -634,41 +634,41 @@ public class Grid extends JPanel {
 	}
 	
 	
-	public String toString() {
-		String output = "   ";
-		for (int i = 0; i < this.grid[0].length; i ++)
-			output += " " + i;
-		output += "\n";
-		for (int r = 0; r < this.grid.length; r++) {
-			output += r + " | ";
-			for (int c = 0; c < this.grid[0].length; c++) {
-				Box b = this.grid[r][c];
-				if (b == null)
-					output += "  ";
-				else
-					output += b.toStringNoReveal() + " ";
-			}
-			output += "|\n";
-		}
-		output += "Game " + this.gameStatusToString();
-		return output;
-	}
+//	public String toString() {
+//		String output = "   ";
+//		for (int i = 0; i < this.grid[0].length; i ++)
+//			output += " " + i;
+//		output += "\n";
+//		for (int r = 0; r < this.grid.length; r++) {
+//			output += r + " | ";
+//			for (int c = 0; c < this.grid[0].length; c++) {
+//				Box b = this.grid[r][c];
+//				if (b == null)
+//					output += "  ";
+//				else
+//					output += b.toStringNoReveal() + " ";
+//			}
+//			output += "|\n";
+//		}
+//		output += "Game " + this.gameStatusToString();
+//		return output;
+//	}
 	
-	public String toStringReveal() {
-		String output = "";
-		for (int r = 0; r < this.grid.length; r++) {
-			for (int c = 0; c < this.grid[0].length; c++) {
-				Box b = this.grid[r][c];
-				if (b == null)
-					output += "n ";
-				else
-					output += b.toString() + " ";
-			}
-			output += "\n";
-		}
-		output += "Game " + this.gameStatusToString();
-		return output;
-	}
+//	public String toStringReveal() {
+//		String output = "";
+//		for (int r = 0; r < this.grid.length; r++) {
+//			for (int c = 0; c < this.grid[0].length; c++) {
+//				Box b = this.grid[r][c];
+//				if (b == null)
+//					output += "n ";
+//				else
+//					output += b.toString() + " ";
+//			}
+//			output += "\n";
+//		}
+//		output += "Game " + this.gameStatusToString();
+//		return output;
+//	}
 	
 	public void updateStatus() {
 		this.status.setText("Game " + this.gameStatusToString());
