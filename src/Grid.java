@@ -552,7 +552,7 @@ public class Grid extends JPanel {
 		Set<Position> cascadeSetPositions = this.getSurroundings(pos);
 		cascadeSetPositions.remove(pos);
 		Set<Box> cascadeSet = new TreeSet<Box>();
-		for (Position p: cascadeSetPositions) {
+		for (Position p : cascadeSetPositions) {
 			Box b = this.getBox(p);
 			if (b != null && b.hidden())
 				cascadeSet.add(b);

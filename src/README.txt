@@ -15,17 +15,119 @@
 ================================================================================
 
 - List the four core concepts, the features they implement, and why each feature
-  is an approprate use of the concept. Incorporate the feedback you got after
+  is an appropriate use of the concept. Incorporate the feedback you got after
   submitting your proposal.
 
-  1.
+  1. 2D Arrays:
+     -  The Grid used to display the game is a 2D array of instances of the
+        abstract class Box.
+          -  This is an appropriate use of 2D arrays because the board itself
+             will be drawn in a grid of images, each corresponding to a box.
+             There are different images depending on the state of the box.
+          -  Display changes based on whether a box is revealed (left click,
+             irreversible) , marked, unmarked, or unsure (states which the user
+             toggles through right clicks). The positions of these Boxes will be
+             final as they should not change throughout the course of the game.
+     -  There are be four difficulties: easy, intermediate, expert, and custom
+        which each correspond to a different grid sizes size (custom can be any
+        size from 4 to 48 rows/columns).
+        -  This is an appropriate use of 2D arrays because the grid does not
+           have to change size while a game is in progress, but rather only when
+           a new game is started. Further, arrays are very easy to instantiate
+           and are efficient.
+     -  Originally, each index in the array null (which works well as a 2D array
+        begins filled with null objects upon instantiation).
+        
+  2. I/O:
+     -  Input output is used in four different components of the game:
+     1. Read in image files and display them in the grid
+     2. Read in and play different audio files for left and right clicks within
+        the grid and also for when the game is won or lost.
+     3. Upon losing a game, the board is written out to a file called
+        previous.txt. The user is then given the option to replay the game, in
+        which case the file is read back in and the game is re-instantiated.
+          -  This is a unique case within the game because normally a null array
+             of Boxes is created. A unique constructor is used to create an
+             array already filled with Mines and Nums.
+     4. Upon winning a game, if the time in which the user completed the game is
+        among the five quickest times for a given difficulty, the user is
+        prompted to enter a name. Then, the name and score are written into a
+        file unique to the difficulty along with the four other top scores from
+        other games. This file is read in when the user clicks the "highscores"
+        button on the bottom right of the GUI which lists the five highscores
+        for each difficulty.
 
-  2.
+  3. Inheritance/Subtyping for Dynamic Dispatch:
+     -  As mentioned, the Grid will be filled with abstract Boxes which will be
+        either Nums or Mines.
+     -  Boxes have a Position, Grid, and enum state (revealed, marked, unmarked,
+        unsure, or checked). They will have setter and getter methods for their
+        states and also will handle right clicks, left clicks, and double left
+        clicks. Implementation of right click will be the same for both Mines
+        and Nums, although each will have a different implementation of single
+        and double left clicks.
+     -  This is an appropriate use of dynamic dispatch because both Nums and
+        Mines can have any of these states, but will handle them differently.
+          -  For example, a user loses if a Mine is revealed, but gets closer to
+             winning if a Num is revealed.
+          -  Secondly, although it would be a misstep to mark a Num, a user can
+             mark Nums or Mines alike.
+          -  The Num class will have an int mineCount which is a record of how
+             many mines are adjacent to it. This is a feature the Mine class
+             will not have.
+          -  Generally, both Nums and Mines will implement the same methods and
+             some implementations overlap, yet so too will some implementations
+             be slightly different. Thus, it makes sense for them to be
+             connected by an overarching abstract class (Box) which cannot be
+             instantiated itself.
+     -  Having Num and Mine implement the same abstract class allows them to be
+        stored in the grid array together as Boxes.
 
-  3.
+  4. Collections:
+     -  Collections are used for four components of the game:
+     1. To create and return a set of surrounding positions to a given position
+          -  A Set is made of all positions adjacent to and containing the 
+             position. Using a Set is appropriate because it can be easily
+             resized, there are no duplicates, and order does not matter.
+          -  This is also appropriate because it is easy to remove and add items
+             to the Set solely by Positions, so using a Set makes it easy
+             to manipulate the set of surroundings based off of the set of Boxes
+             at these positions in order to manipulate the grid as needed.
+     2. To create and use a set of surrounding positions to cascade to given
+        a position.
+          -  This builds off of the first use of collections: a new set to
+             cascade to (reveal) is created from the set of surrounding
+             positions of only Boxes that are not null and are hidden. A new Set
+             is used while the original set is iterated through to avoid a
+             concurrent modification exception.
+     3. To efficiently randomly place mines upon grid generation
+          -  This use of collections also builds off of the first use: to
+             decide where a Mine can be placed, an ArrayList of Positions of the
+             whole grid is made excepting those positions included in the
+             surroundings of where the user clicks.
+          -  A random index of the List is then chosen and a new Bomb is placed
+             at that index in the Grid array. The Position at that index in
+             the List is then removed. This process repeats until the number of
+             mines placed is equal to the number of mines corresponding to the
+             current game's difficulty.
+               -  Using a list is appropriate here because it is easy to resize
+                  but also can be accessed by index.
+               -  This is a more efficient implementation than just using the
+                  pre-existing array because the program would always have to
+                  check if the randomly chosen position contains a mine or is
+                  within the surroundings of where the user clicked. This would
+                  be particularly inefficient in the case of a custom
+                  difficulty with a high quantity of mines.
+     4. To read high scores and efficiently manipulate them
+          -  A LinkedList is used to read in highscores from each highscore
+             file. On the most basic level, each line in the file is added to
+             the List, and this can be further manipulated to isolate just
+             usernames or just scores.
+          -  Using a LinkedList is appropriate because maintaining the order of
+             entries is essential. Secondly, it is easy to iterate through,
+             making writing out quick. Lastly, it can be resized to add new
+             highscores and remove ones which are replaced.
 
-  4.
-  
 ================================================================================
 =:                                  Overview                                  :=
 ================================================================================
@@ -540,7 +642,7 @@ double clicks
 - Cite any external resources (libraries, images, tutorials, etc.) that you may
   have used while implementing your game.
   
-  Help with implementation:
+  Help with Implementation:
   
       http://stackoverflow.com/questions/22653592/how-to-give-spaces-between-jlabel
       http://stackoverflow.com/questions/685521/multiline-text-in-jlabel
