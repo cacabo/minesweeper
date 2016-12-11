@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -250,7 +249,7 @@ public class Game implements Runnable {
 				// Title added at the top of the pane
 				final JLabel title = new JLabel("Minesweeper Highscores:");
 				title.setBorder(paddingWide);
-				title.setFont(new Font("Sans Serif", Font.BOLD, 22));
+				title.setFont(new Font("Sans Serif", Font.BOLD, 20));
 				highScoresFrame.add(title, BorderLayout.NORTH);
 				
 				// Wrapper panel for the scores corresponding to each difficulty
@@ -285,6 +284,22 @@ public class Game implements Runnable {
 				
 				// Add the difficulties pane, set the frame size to the size of components, and make the frame visible.
 				highScoresFrame.add(difficulties);
+				
+				// Create a button which closes the instructions panel
+				JPanel playContainer = new JPanel();
+				playContainer.setBorder(padding);
+				JButton play = new JButton("Let's Beat the Records!");
+				play.setFont(new Font("Sans Serif", Font.ITALIC, 22));
+				play.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						highScoresFrame.dispose();
+					}
+				});
+				
+				playContainer.add(play);
+				// Fix the play button to the bottom of the frame
+				highScoresFrame.add(playContainer, BorderLayout.SOUTH);
+
 				highScoresFrame.pack();
 				highScoresFrame.setVisible(true);
 			}
@@ -343,7 +358,7 @@ public class Game implements Runnable {
 				JPanel playContainer = new JPanel();
 				playContainer.setBorder(padding);
 				JButton play = new JButton("Let's Play!");
-				play.setFont(new Font("Sans Serif", Font.ITALIC, 24));
+				play.setFont(new Font("Sans Serif", Font.ITALIC, 20));
 				play.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						instr.dispose();
