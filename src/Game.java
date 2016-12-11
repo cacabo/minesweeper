@@ -88,6 +88,7 @@ public class Game implements Runnable {
 
 		// Wrapper for top buttons
 		final JPanel control_panel = new JPanel();
+		control_panel.setBorder(new EmptyBorder(12, 0, 0, 0));
 		// Added to frame to stick to top border
 		frame.add(control_panel, BorderLayout.NORTH);
 
@@ -202,10 +203,10 @@ public class Game implements Runnable {
 						// Asserts values entered are correct
 						if (row < 4 || row > 48 || col < 4 || col > 48 || mines < 0 || mines > row * col - 9)
 							throw new IllegalArgumentException();
-						// Adjusts frame size to the new grid size
-						frame.pack();
 						// Resets the grid with the new parameters
 						grid.reset(row, col, mines);
+						// Adjusts frame size to the new grid size
+						frame.pack();
 						// Darkens the custom button to show that it is the current difficulty
 						toggleDifficultyButtons(custom, beginner, intermediate, expert);
 					} catch (IllegalArgumentException error) {
@@ -379,6 +380,7 @@ public class Game implements Runnable {
 		
 		// Creates a wrapper panel to go on the bottom of the instructions and highscores buttons
 		JPanel info = new JPanel();
+		info.setBorder(new EmptyBorder(0, 0, 12, 0));
 		info.add(instructions);
 		info.add(highscores);
 

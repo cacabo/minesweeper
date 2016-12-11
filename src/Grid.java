@@ -100,11 +100,11 @@ public class Grid extends JPanel {
 			clip.open(audioInputStream);
 			clip.start();
 		} catch (IOException exception) {
-			System.out.println("Caught IO Exception");
+			System.out.println("Caught IO Exception: " + exception.getMessage());
 		} catch (UnsupportedAudioFileException exception) {
-			System.out.println("Caught Unsupported Audio File Exception"); 
+			System.out.println("Caught Unsupported Audio File Exception: " + exception.getMessage()); 
 	    } catch (LineUnavailableException exception) {
-			System.out.println("Caught Line Unavailable Exception");
+			System.out.println("Caught Line Unavailable Exception: " + exception.getMessage());
 		}
 	}
 	
@@ -548,6 +548,7 @@ public class Grid extends JPanel {
 		this.timer.start();
 	}
 	
+	// Reveals all boxes adjacent to a clicked box which are hidden
 	public void cascade(Position pos) {
 		Set<Position> cascadeSetPositions = this.getSurroundings(pos);
 		cascadeSetPositions.remove(pos);
@@ -581,17 +582,17 @@ public class Grid extends JPanel {
 			clip.open(audioInputStream);
 			clip.start();
 		} catch (IOException e) {
-			System.out.println("Caught IO Exception");
+			System.out.println("Caught IO Exception: " + e.getMessage());
 		} catch (UnsupportedAudioFileException e) {
-			System.out.println("Caught Unsupported Audio File Exception"); 
+			System.out.println("Caught Unsupported Audio File Exception: " + e.getMessage()); 
 	    } catch (LineUnavailableException e) {
-			System.out.println("Caught Line Unavailable Exception");
+			System.out.println("Caught Line Unavailable Exception: " + e.getMessage());
 		}
 	
 		try {
 			this.writeGrid();
 		} catch (IOException e) {
-			System.out.println("Caught IO Exception");
+			System.out.println("Caught IO Exception: " + e.getMessage());
 		}
 		
 		// Creates a frame telling the loser they lost and allowing the user to replay game, start a new game, or quit
@@ -613,7 +614,7 @@ public class Grid extends JPanel {
 				try {
 					replay();
 				} catch (IOException exception) {
-					System.out.println("Caught IO Exception");
+					System.out.println("Caught IO Exception: " + exception.getMessage());
 				}
 				lose.dispose();
 			}
@@ -670,11 +671,11 @@ public class Grid extends JPanel {
 			clip.open(audioInputStream);
 			clip.start();
 		} catch (IOException e) {
-			System.out.println("Caught IO Exception");
+			System.out.println("Caught IO Exception: " + e.getMessage());
 		} catch (UnsupportedAudioFileException e) {
-			System.out.println("Caught Unsupported Audio File Exception"); 
+			System.out.println("Caught Unsupported Audio File Exception: " + e.getMessage()); 
 	    } catch (LineUnavailableException e) {
-			System.out.println("Caught Line Unavailable Exception");
+			System.out.println("Caught Line Unavailable Exception: " + e.getMessage());
 		}
 		
 		// Creates a pane asking the user to enter their name if they set a highscore
@@ -714,7 +715,7 @@ public class Grid extends JPanel {
 				}					
 			}
 		} catch (IOException e) {
-			System.out.println("Caught an IO Exception");
+			System.out.println("Caught an IO Exception: " + e.getMessage());
 		}
 		// Rewrite the highscores file corresponding to the difficulty with the user's name and score
 		this.writeHighScores();
@@ -815,7 +816,7 @@ public class Grid extends JPanel {
 			r.close();
 			return arr;
 		} catch (NoSuchFileException e) {
-			System.out.println("Caught No Such File Exception");
+			System.out.println("Caught No Such File Exception: " + e.getMessage());
 		}
 		// Returns an empty char array if the reading fails
 		return new char[0][0];
@@ -892,7 +893,7 @@ public class Grid extends JPanel {
 			}
 		}
 		catch (IOException e) {
-			System.out.println("Caught an IO Exception");
+			System.out.println("Caught an IO Exception: " + e.getMessage());
 		}
 		return names;
 	}

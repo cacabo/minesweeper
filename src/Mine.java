@@ -30,7 +30,7 @@ public class Mine extends Box implements Comparable<Box> {
 	}
 	
 	public int compareTo(Box b) {
-		return this.getPosition().compareTo(b.getPosition());
+		return super.compareTo(b);
 	}
 	
 	// Draws the mine dependent on the box state

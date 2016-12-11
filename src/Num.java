@@ -38,7 +38,7 @@ public class Num extends Box implements Comparable<Box> {
 				try {
 					grid.win();
 				} catch (IOException e) {
-					System.out.println("Caught an IOException");
+					System.out.println("Caught an IOException: " + e.getMessage());
 				}
 				return;
 			}
@@ -54,6 +54,9 @@ public class Num extends Box implements Comparable<Box> {
 	
 	// Handles a double left click on the number
 	public void doubleLeftClick() {
+		// Do nothing if the game is finished
+				if (this.grid.won() || this.grid.lost())
+					  return;
 		if (this.revealed()) {
 			// If the box is touching as many marked mines as it actually does, it will reveal all mines around itself
 			// via the cascade method earlier.
@@ -71,7 +74,7 @@ public class Num extends Box implements Comparable<Box> {
 				try {
 					TimeUnit.MILLISECONDS.sleep(125);
 				} catch (InterruptedException e) {
-					System.out.println("Caught and Interrupted Exception");
+					System.out.println("Caught and Interrupted Exception: " + e.getMessage());
 				}
 				// Reset the state to revealed
 				this.setState(BoxState.REVEALED);
@@ -91,7 +94,7 @@ public class Num extends Box implements Comparable<Box> {
 	}
 	
 	public int compareTo(Box b) {
-		return this.getPosition().compareTo(b.getPosition());
+		return super.compareTo(b);
 	}
 	
 	// Draws the num dependent on its boxState
