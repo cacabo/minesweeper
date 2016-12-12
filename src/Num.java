@@ -40,7 +40,6 @@ public class Num extends Box implements Comparable<Box> {
 				} catch (IOException e) {
 					System.out.println("Caught an IOException: " + e.getMessage());
 				}
-				return;
 			}
 			// Reveal all surrounding boxes if the box touches no mines
 			// Works recursively by recalling this method (within grid.cascade) if an adjacent box also touches 0 mines

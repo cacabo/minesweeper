@@ -131,7 +131,9 @@ public class Grid extends JPanel {
 	public void mouseListenerHelper() {
 		this.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseClicked(MouseEvent e) {	
+			public void mouseClicked(MouseEvent e) {
+				if (won() || lost())
+					return;
 				// Find c, the column, and r, the row, in which the click event occurred
 				int x = e.getX();
 				int c = (int) (x / scale());
@@ -481,6 +483,11 @@ public class Grid extends JPanel {
 				// Reassigns b
 				b = this.grid[row][col];
 			}
+			// Starts the game if it is not already started, will only happen in the case of replaying a game
+			if (this.notStarted()) {
+				this.gameStatus = GameStatus.IN_PROGRESS;
+				this.timer.start();
+			}
 			// Dispatches left click to the box itself
 			b.leftClick();
 		}
@@ -550,6 +557,9 @@ public class Grid extends JPanel {
 	
 	// Reveals all boxes adjacent to a clicked box which are hidden
 	public void cascade(Position pos) {
+		// Do nothing if the game is finished
+		if (this.won() || this.lost())
+			return;
 		Set<Position> cascadeSetPositions = this.getSurroundings(pos);
 		cascadeSetPositions.remove(pos);
 		Set<Box> cascadeSet = new TreeSet<Box>();
@@ -716,6 +726,7 @@ public class Grid extends JPanel {
 		}
 		// Rewrite the highscores file corresponding to the difficulty with the user's name and score
 		this.writeHighScores();
+		this.repaint();
 	}
 	
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
