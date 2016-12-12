@@ -705,12 +705,9 @@ public class Grid extends JPanel {
 							throw new IllegalArgumentException();
 						else
 							this.setName(name);
-					} catch(Exception error) {
-						JOptionPane.showMessageDialog(null,
-							    "Input Exception.",
-							    "Inane error",
-							    JOptionPane.ERROR_MESSAGE
-							    );
+					} catch (Exception error) {
+						JOptionPane.showMessageDialog(null, "Input Exception.", "Inane error",
+												      JOptionPane.ERROR_MESSAGE);
 					}
 				}					
 			}
@@ -835,7 +832,7 @@ public class Grid extends JPanel {
 	public static List<String> highScoresToStrings(Difficulty d) throws IOException {
 		List<String> l = new LinkedList<String>();
 		// Reads from the file corresponding to the difficulty
-		BufferedReader r = new BufferedReader(new FileReader("" + d.toString() + ".txt"));
+		BufferedReader r = new BufferedReader(new FileReader("" + d.toString().toLowerCase() + ".txt"));
 		try {
 			boolean done = false;
 			while (!done) {
@@ -848,6 +845,7 @@ public class Grid extends JPanel {
 			}
 		}
 		catch (IOException e) {
+			System.out.println("Caught an IO Exception: " + e.getMessage());
 		} finally {
 			r.close();
 		}
@@ -868,6 +866,7 @@ public class Grid extends JPanel {
 			}
 		}
 		catch (IOException e) {
+			System.out.println("Caught an IOException: " + e.getMessage());
 		}
 		return ints;
 	}
