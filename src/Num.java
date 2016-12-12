@@ -120,6 +120,6 @@ public class Num extends Box implements Comparable<Box> {
 		}
 		// Otherwise the num is revealed
 		else
-			g.drawImage(createImage(this.numMines + ".png"), x, y, grid.scale(), grid.scale(), null);
+			g.drawImage(createImage("" + this.numMines + ".png"), x, y, grid.scale(), grid.scale(), null);
 	}
 }

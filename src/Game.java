@@ -420,6 +420,7 @@ public class Game implements Runnable {
 				output += "<li>-</li>";
 			}
 		} catch (IOException e) {
+			System.out.println("Caught an IOException: " + e.getMessage());
 		}
 		// CLose the html elements
 		output += "</ol></html>";
