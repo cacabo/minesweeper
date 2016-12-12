@@ -835,7 +835,7 @@ public class Grid extends JPanel {
 	public static List<String> highScoresToStrings(Difficulty d) throws IOException {
 		List<String> l = new LinkedList<String>();
 		// Reads from the file corresponding to the difficulty
-		BufferedReader r = new BufferedReader(new FileReader(d.toString() + ".txt"));
+		BufferedReader r = new BufferedReader(new FileReader("" + d.toString() + ".txt"));
 		try {
 			boolean done = false;
 			while (!done) {
