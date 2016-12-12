@@ -947,7 +947,7 @@ public class Grid extends JPanel {
 		// Otherwise get the updated list of highscores
 		List<String> strings = newHighScoresToString();
 		// Write the list to the file
-		PrintWriter writer = new PrintWriter(this.difficultyToString().toString() + ".txt");
+		PrintWriter writer = new PrintWriter(this.difficultyToString().toLowerCase() + ".txt");
 		for (String s : strings)
 			writer.println(s);
 		writer.close();
